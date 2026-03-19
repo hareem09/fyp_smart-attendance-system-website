@@ -1,4 +1,4 @@
-const authController = require("../../controller/auth/authControllerjs")
+const authController = require("../../controller/auth/authController.js")
 const express = require("express")
 const router = express.Router();
 
@@ -10,7 +10,6 @@ const{
     resetPassword,
     refreshAccessToken
 } = authController;
-
 
 router.post("/login/student",studentLogin);
 router.post("/login/admin",adminLogin);

@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
 dotenv.config();
 
-export const generateAuthToken = (user) => {
+ const generateAuthToken = (user) => {
     const payload = {
     id: user.id,
     email: user.email
@@ -11,7 +11,7 @@ export const generateAuthToken = (user) => {
     return accessToken;
 
 }
-export const generateRefreshToken=(user)=>{
+const generateRefreshToken=(user)=>{
     const payload={
         id:user.id,
         email:user.email
@@ -19,3 +19,8 @@ export const generateRefreshToken=(user)=>{
     const refreshToken=jwt.sign(payload,process.env.REFRESH_TOKEN_SECRET,{expiresIn:'7d'})
     return refreshToken
 } 
+
+module.exports = {
+    generateAuthToken,
+    generateRefreshToken
+}

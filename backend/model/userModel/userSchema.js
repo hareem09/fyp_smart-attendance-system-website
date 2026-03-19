@@ -88,6 +88,10 @@ const userSchema = new mongoose.Schema({
   resetPasswordExpire: {
     type: Date
   },
+  refreshToken:{
+   type:String,
+    default:null
+  },
 
   // Profile
   phone: {
