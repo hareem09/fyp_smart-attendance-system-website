@@ -7,7 +7,7 @@ function authorizeRoles(...allowedRoles) {
     }
 
     // Super admin bypass
-    if (req.user.role_id === 1) {
+    if (req.user.role === 'super_admin') {
       return next();
     }
 
