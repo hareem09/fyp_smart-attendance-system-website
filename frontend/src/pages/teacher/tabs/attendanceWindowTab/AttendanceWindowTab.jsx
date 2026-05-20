@@ -29,8 +29,8 @@ export default function AttendanceWindowTab({ subjects }) {
   }, [activeWindow]);
    const fetchSubjects = async () => {
        try {
-         const res = await API.get("http://localhost:3000/api/subjects/teacher-subjects");
-         console.log("Subjects API response:", res.data.data); // 👈 ADD THIS
+         const res = await API.get("http://localhost:3000/api/teacher/teacher-subjects");
+         console.log("Subjects API response:", res.data); // 👈 ADD THIS
          setSubjects(res.data.data || []);
          setTeacherId(res.data[0]?.teacher?._id || "");
        } catch (err) {

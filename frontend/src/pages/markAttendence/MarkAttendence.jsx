@@ -181,7 +181,7 @@ const MarkAttendance = () => {
 };
 
   return (
-    <div style={{ textAlign: "center", padding: 24 }}>
+    <div style={{ textAlign: "center", padding: 24 }} className="flex flex-col justify-center gap-5">
       <h2>Mark Attendance</h2>
       <select
         value={selectedSubject}
@@ -237,6 +237,7 @@ const MarkAttendance = () => {
           </div>
         )}
       <video
+      className="self-center"
         ref={videoRef}
         autoPlay
         muted
@@ -277,7 +278,7 @@ const MarkAttendance = () => {
         onClick={handleMarkAttendance}
         disabled={status === "processing" || !location}
         style={{
-          padding: "12px 32px",
+          padding: "12px 12px",
           fontSize: 16,
           background: status === "processing" ? "#ccc" : "#3b82f6",
           color: "white",
@@ -285,6 +286,7 @@ const MarkAttendance = () => {
           borderRadius: 8,
           cursor: status === "processing" ? "not-allowed" : "pointer",
         }}
+        className="w-32 self-center"
       >
         {status === "processing" ? "Processing..." : "Mark Attendance"}
       </button>

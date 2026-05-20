@@ -11,6 +11,9 @@ const {
     getLowAttendanceStudents,
     exportAttendance
 } = teacherController;
+const {
+   getTeacherSubjects,
+} = require('../../controller/subject/subjectController.js');
 router.use(authenticateToken);
 router.get('/profile',getProfile);
 router.get('/students',getMyStudents);
@@ -19,5 +22,6 @@ router.get('/today',getTodayAttendance);
 router.put('/attendance/:studentId',updateAttendance);
 router.get('/low-attendance',getLowAttendanceStudents);
 router.get('/export',exportAttendance);
+router.get('/teacher-subjects',            getTeacherSubjects);
 
 module.exports = router;

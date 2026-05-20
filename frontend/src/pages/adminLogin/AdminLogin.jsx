@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate} from "react-router-dom";
 import { Link } from "react-router-dom";
 
 function AdminLogin() {
@@ -12,7 +12,7 @@ function AdminLogin() {
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-
+ 
   const handleChange = (e) => {
     if (e.target.name === "email") {
       setEmail(e.target.value);
@@ -29,10 +29,14 @@ function AdminLogin() {
       const res = await axios.post("http://localhost:3000/api/auth/login/admin", { email, password },{ withCredentials: true });
       localStorage.setItem("token", res.data.accessToken);
       localStorage.setItem("user", JSON.stringify(res.data.data));
-      console.log(res.data);
+      console.log(res.data.data.role);
            setSuccess(true);
       alert("Login successful!");
+      if(res.data.data.role=='teacher'){
+        navigate('/teacher/dashboard')
+      }else{
        navigate('/admin/dashboard');
+      }
     } catch (err) {
       console.error(err);
       setError("Invalid email or password");

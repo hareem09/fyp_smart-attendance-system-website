@@ -41,15 +41,15 @@ import TimetableTab from '../tabs/timetableTab/TimetableTab';
         API.get('http://localhost:3000/api/teacher/today'),
         API.get('http://localhost:3000/api/teacher/all'),
         API.get('http://localhost:3000/api/teacher/students'),
-        API.get('http://localhost:3000/api/subjects/teacher-subjects'),
-        API.get('http://localhost:3000/api/teacher/timetable')
+        API.get('http://localhost:3000/api/teacher/teacher-subjects'),
+        // API.get('http://localhost:3000/api/teacher/timetable')
       ]);
 
       const today = todayRes.data.data   || [];
       const all   = allRes.data.data  || [];
       const studs = studentsRes.data.data || [];
       const subs  = subjectsRes.data.data|| [];
-      const timetable = timetableRes.data.data || [];
+      // const timetable = timetableRes.data.data || [];
 
       setTodayRecords(today);
       setAllRecords(all);
@@ -238,11 +238,11 @@ import TimetableTab from '../tabs/timetableTab/TimetableTab';
               subjects={subjects}
             />
           )}
-           {activeTab === 'timetable' && (
+           {/* {activeTab === 'timetable' && (
             <TimetableTab
               subjects={subjects}
             />
-          )}
+          )} */}
         </div>
       </main>
     </div>

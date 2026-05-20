@@ -75,7 +75,7 @@ export default function EnrollFace() {
   };
 
   return (
-    <div style={{ textAlign: 'center', padding: 24 }}>
+    <div style={{ textAlign: 'center', padding: 24 }} className='flex flex-col justify-center'>
       <h2>Face Enrollment</h2>
       <p>Capture 5 photos of your face from slightly different angles</p>
 
@@ -86,6 +86,7 @@ export default function EnrollFace() {
         width={400}
         height={300}
         style={{ borderRadius: 12 }}
+        className='self-center'
       />
 
       <canvas
@@ -117,12 +118,12 @@ export default function EnrollFace() {
           onClick={capturePhoto}
           style={{
             padding:    '10px 24px',
-            background: '#3b82f6',
             color:      'white',
             border:     'none',
             borderRadius: 8,
             margin:     8
           }}
+          className='w-32 self-center bg-blue-500 hover:bg-blue-400'
         >
           📷 Capture Photo ({images.length}/5)
         </button>

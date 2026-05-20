@@ -12,7 +12,7 @@ const {
 // router.use(verifyToken)
 
 router.post('/',createSubject);
-router.get('/',   getAllSubjects);
+router.get('/all',   getAllSubjects);
 router.delete('/:id',deleteSubject);
 router.post('/enroll', enrollStudent);
 router.post('/remove-student', removeStudent);

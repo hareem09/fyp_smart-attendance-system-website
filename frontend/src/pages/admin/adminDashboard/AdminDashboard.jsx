@@ -13,6 +13,7 @@ import ReportsTab      from '../tabs/reports/Reports';
 import SubjectsTab from '../tabs/subjectManagement/SubjectManagement';
 import AssignSubjectsTab from '../tabs/assignSubject/AssignSubject';
 import CreateInvite from '../tabs/createInvite/CreateInvite';
+import AssignToStudent from '../tabs/assignToStudent/AssignToStudent';
 export default function AdminDashboard() {
   const navigate   = useNavigate();
   const admin      = JSON.parse(localStorage.getItem('user') || '{}');
@@ -65,9 +66,10 @@ export default function AdminDashboard() {
       setTodayAttend(todayRes.data.data    || []);
       setAllAttendance(allAttRes.data.data || []);
       setGeofences(geoRes.data.data        || []);
-      setSubjects(subjectRes.data.data    || []);
+      setSubjects(subjectRes.data   || []);
       console.log(studentsRes.data)
        console.log(enrollRes.data) 
+       console.log(subjectRes.data)
     } catch (err) {
       console.error('Fetch error:', err.message);
     } finally {
@@ -121,7 +123,7 @@ export default function AdminDashboard() {
     { id: 'geofence',    label: 'Geofence',           icon: '📍' },
     { id: 'reports',     label: 'Reports',            icon: '📊' },
     { id: 'subjects',    label: 'Subjects',             icon: '📚' },
-    { id: 'assign',      label: 'Assign Subjects',     icon: '🧑‍🏫'}
+    { id: 'assign',      label: 'Assign Subjects to student',     icon: '🧑‍🏫'}
   ];
 
   if (loading) {
@@ -289,6 +291,9 @@ export default function AdminDashboard() {
           )}
           {activeTab === 'inviteTeacher' && (
             <CreateInvite />
+          )}
+          {activeTab === 'assign' && (
+            <AssignToStudent/>
           )}
         </div>
       </main>

@@ -9,7 +9,8 @@ const {
     getEnrollmentStatus,
     getMyAttendance,
     getMyAttendanceSummary,
-    getTodayAttendance
+    getTodayAttendance,
+    enrolledSubjects
 } = studentController;
 
 router.use(authenticateToken)
@@ -20,5 +21,5 @@ router.get('/status',getEnrollmentStatus);
 router.get('/attendance',getMyAttendance);
 router.get('/summary',getMyAttendanceSummary);
 router.get('/today',getTodayAttendance);
-
+router.get('/enrolled-sub',enrolledSubjects)
 module.exports = router;

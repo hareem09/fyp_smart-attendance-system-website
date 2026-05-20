@@ -22,7 +22,8 @@ const getMyStudents = async (req, res) => {
     // Get all subjects assigned to this teacher
     const subjects = await Subject.find({ teacher: req.user.id })
       .populate('students', 'name email rollNo department semester enrollmentStatus');
-
+     console.log(subjects)
+     console.log(subjects[0].students); 
     // Flatten all students across all subjects
     const studentMap = {};
     subjects.forEach(subject => {
@@ -30,9 +31,9 @@ const getMyStudents = async (req, res) => {
         studentMap[student._id] = student;
       });
     });
-
+     console.log(studentMap)
     const students = Object.values(studentMap);
-
+    console.log(students.length)
     res.status(200).json({ success: true, count: students.length, data: students });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Server error', error: error.message });

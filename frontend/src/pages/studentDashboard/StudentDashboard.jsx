@@ -11,7 +11,7 @@ const StudentDashboard = () => {
   const [summary,       setSummary]       = useState([]);
   const [recentRecords, setRecentRecords] = useState([]);
   const [loading,       setLoading]       = useState(true);
-
+  const [subject,setSubject]= useState([]);
   useEffect(() => {
     fetchAllData();
   }, []);
@@ -19,14 +19,16 @@ const StudentDashboard = () => {
   const fetchAllData = async () => {
     try {
       setLoading(true);
-      const [todayRes, summaryRes, recentRes] = await Promise.all([
+      const [todayRes, summaryRes, recentRes,subRes] = await Promise.all([
         API.get('http://localhost:3000/api/student/today'),
         API.get('http://localhost:3000/api/student/summary'),
-        API.get('http://localhost:3000/api/student/attendance')
+        API.get('http://localhost:3000/api/student/attendance'),
+        API.get('http://localhost:3000/api/student/enrolled-sub')
       ]);
       setTodayRecords(todayRes.data.data   || []);
       setSummary(summaryRes.data.data      || []);
       setRecentRecords(recentRes.data.data || []);
+      setSubject(subRes.data.data || []);
     } catch (err) {
       console.error('Failed to fetch data:', err);
     } finally {
@@ -234,7 +236,7 @@ const StudentDashboard = () => {
               </p>
               <span className="text-2xl">📚</span>
             </div>
-            <p className="text-3xl font-bold text-gray-800">{summary.length}</p>
+            <p className="text-3xl font-bold text-gray-800">{subject.length}</p>
             <p className="text-gray-400 text-xs mt-1">Enrolled subjects</p>
           </div>
         </div>

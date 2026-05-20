@@ -2,6 +2,8 @@
 const User = require('../../model/userModel/userSchema.js');
 const Attendance = require('../../model/attendanceModel/attendanceSchema.js');
 const axios = require('axios');
+const subject = require('../../model/subjectModel/subjectSchema.js')
+const mongoose = require("mongoose");
 
 // ─── GET PROFILE ──────────────────────────────────────────────
 const getProfile = async (req, res) => {
@@ -131,37 +133,65 @@ const getMyAttendance = async (req, res) => {
 const getMyAttendanceSummary = async (req, res) => {
   try {
     const summary = await Attendance.aggregate([
-      { $match: { student: req.user.id } },
+      {
+        $match: {
+          student: new mongoose.Types.ObjectId(req.user.id)
+        }
+      },
       {
         $group: {
-          _id: '$subject',
+          _id: "$subject",
           totalClasses: { $sum: 1 },
           presentCount: {
-            $sum: { $cond: [{ $eq: ['$status', 'present'] }, 1, 0] }
+            $sum: {
+              $cond: [{ $eq: ["$status", "present"] }, 1, 0]
+            }
           }
         }
       },
       {
         $addFields: {
           percentage: {
-            $multiply: [{ $divide: ['$presentCount', '$totalClasses'] }, 100]
+            $round: [
+              {
+                $cond: [
+                  { $eq: ["$totalClasses", 0] },
+                  0,
+                  {
+                    $multiply: [
+                      { $divide: ["$presentCount", "$totalClasses"] },
+                      100
+                    ]
+                  }
+                ]
+              },
+              2
+            ]
           }
         }
       },
       {
         $lookup: {
-          from: 'subjects',
-          localField: '_id',
-          foreignField: '_id',
-          as: 'subject'
+          from: "subjects",
+          localField: "_id",
+          foreignField: "_id",
+          as: "subject"
         }
       },
-      { $unwind: '$subject' }
+      { $unwind: "$subject" }
     ]);
 
-    res.status(200).json({ success: true, data: summary });
+    return res.status(200).json({
+      success: true,
+      data: summary
+    });
+
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Server error', error: error.message });
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message
+    });
   }
 };
 
@@ -183,7 +213,27 @@ const getTodayAttendance = async (req, res) => {
     res.status(500).json({ success: false, message: 'Server error', error: error.message });
   }
 };
+const enrolledSubjects = async (req, res) => {
+  try {
+    const studentId = req.user.id;
 
+    const records = await subject.find({
+      students: studentId
+    });
+
+    return res.status(200).json({
+      success: true,
+      data: records
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message
+    });
+  }
+};
 module.exports = {
     getProfile,
     updateProfile,
@@ -191,5 +241,6 @@ module.exports = {
     getEnrollmentStatus,
     getMyAttendance,
     getMyAttendanceSummary,
-    getTodayAttendance
+    getTodayAttendance,
+    enrolledSubjects
 }
