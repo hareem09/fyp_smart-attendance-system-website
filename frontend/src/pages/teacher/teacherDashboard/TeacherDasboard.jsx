@@ -8,7 +8,7 @@ import StudentsTab   from '../tabs/studentTab/StudentTab';
 import SubjectsTab   from '../tabs/subjectTab/SubjectTab';
 import AttendanceWindowTab from '../tabs/attendanceWindowTab/AttendanceWindowTab';
 import TimetableTab from '../tabs/timetableTab/TimetableTab';
-// import ReportsTab    from '../tabs/reportTab/ReportTab';
+import ReportsTab    from '../tabs/reportTab/ReportTab';
 
  function TeacherDashboard() {
   const navigate = useNavigate();
@@ -42,7 +42,6 @@ import TimetableTab from '../tabs/timetableTab/TimetableTab';
         API.get('http://localhost:3000/api/teacher/all'),
         API.get('http://localhost:3000/api/teacher/students'),
         API.get('http://localhost:3000/api/teacher/teacher-subjects'),
-        // API.get('http://localhost:3000/api/teacher/timetable')
       ]);
 
       const today = todayRes.data.data   || [];
@@ -83,7 +82,6 @@ import TimetableTab from '../tabs/timetableTab/TimetableTab';
     { id: 'students',   label: 'My Students',  icon: '👨‍🎓' },
     { id: 'subjects',   label: 'My Subjects',  icon: '📚' },
     { id: 'reports',    label: 'Reports',      icon: '📊' },
-    { id: 'timetable',   label: 'Timetable',    icon: '🗓️'},
     {
       id: 'attendanceWindow',
       label: 'Attendance Window',

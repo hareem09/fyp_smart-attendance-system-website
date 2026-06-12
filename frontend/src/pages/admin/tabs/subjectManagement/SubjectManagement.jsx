@@ -34,7 +34,8 @@ export default function SubjectManagement({ onRefresh }) {
   const fetchSubjects = async () => {
     try {
       const res = await API.get('http://localhost:3000/api/admin/subjects');
-      setSubjects(res.data.data || []);
+      setSubjects(res.data || []);
+      console.log(res.data)
     } catch (err) {
       console.error('Failed to fetch subjects');
     }

@@ -67,6 +67,7 @@ export default function AdminDashboard() {
       setAllAttendance(allAttRes.data.data || []);
       setGeofences(geoRes.data.data        || []);
       setSubjects(subjectRes.data   || []);
+      console.log('attendance',allAttRes.data)
       console.log(studentsRes.data)
        console.log(enrollRes.data) 
        console.log(subjectRes.data)
@@ -77,12 +78,22 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleLogout = () => {
+const handleLogout = async () => {
+  try {
+    console.log('logout hit')
+    // call backend logout first
+    await API.post("/auth/logout");
+    // remove local data
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    navigate('/admin/login');
-  };
 
+    // redirect
+    navigate('/login/admin');
+
+  } catch (error) {
+    console.error('Logout failed:', error);
+  }
+};
   // ── ENROLLMENT ACTIONS ─────────────────────────────────────
   const handleApprove = async (id) => {
     try {
@@ -119,7 +130,7 @@ export default function AdminDashboard() {
     },
     { id: 'students',    label: 'Students',           icon: '👨‍🎓' },
     { id: 'enrollments', label: 'Enrollments',        icon: '📷' },
-    { id: 'attendance',  label: 'Attendance',         icon: '📋' },
+    // { id: 'attendance',  label: 'Attendance',         icon: '📋' },
     { id: 'geofence',    label: 'Geofence',           icon: '📍' },
     { id: 'reports',     label: 'Reports',            icon: '📊' },
     { id: 'subjects',    label: 'Subjects',             icon: '📚' },

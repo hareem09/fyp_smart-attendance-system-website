@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import axios from "axios";
+import API from "../../api/axios";
 import { useNavigate} from "react-router-dom";
 import { Link } from "react-router-dom";
 
@@ -26,10 +26,14 @@ function AdminLogin() {
         setError(null);
         setSuccess(false);
     try {
-      const res = await axios.post("http://localhost:3000/api/auth/login/admin", { email, password },{ withCredentials: true });
+      const res = await API.post("http://localhost:3000/api/auth/login/admin", { email, password },{ withCredentials: true });
+      
+      console.log(res.data);
+      console.log(res.data.accessToken)
       localStorage.setItem("token", res.data.accessToken);
       localStorage.setItem("user", JSON.stringify(res.data.data));
       console.log(res.data.data.role);
+      console.log(res.data.data)
            setSuccess(true);
       alert("Login successful!");
       if(res.data.data.role=='teacher'){

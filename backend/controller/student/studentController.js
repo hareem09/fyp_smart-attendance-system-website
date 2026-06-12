@@ -63,12 +63,12 @@ const enrollFace = async (req, res) => {
 
     console.log('5. Python response:', aiResponse.data);
 
+    console.log(aiResponse.data.embeddings);
     await User.findByIdAndUpdate(req.user.id, {
-      faceEmbedding:    aiResponse.data.embedding,
+      faceEmbedding:`data/embeddings/${req.user.id}`,
       enrollmentStatus: 'pending',
       enrollmentDate:   Date.now()
     });
-
     res.status(200).json({
       success: true,
       message: 'Face enrolled. Awaiting admin approval.'

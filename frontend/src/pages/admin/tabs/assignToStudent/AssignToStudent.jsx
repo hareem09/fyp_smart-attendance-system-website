@@ -177,7 +177,7 @@ export default function AssignToStudent() {
               <option value="">Select student...</option>
               {students.map((s) => (
                 <option key={s._id} value={s._id}>
-                  {s.name} ({s.rollNo})
+                  {s.name} ({s.rollNo}) semester {s.semester}
                 </option>
               ))}
             </select>
@@ -195,7 +195,7 @@ export default function AssignToStudent() {
               <option value="">Select subject...</option>
               {subjects.map((s) => (
                 <option key={s._id} value={s._id}>
-                  {s.name} — {s.code}
+                  {s.name} — {s.code} — Semester{s.semester}
                 </option>
               ))}
             </select>

@@ -34,23 +34,24 @@ const [loadingApprove, setLoadingApprove] = useState(null);
       setLoadingApprove(null);
     }
   };
-//   const fetchEnrollStudents = async () =>{
-//     try{
-//         const res=await API.get('http://localhost:3000/api/admin/users?role=student&enrollmentStatus=approved')
-//         setApproved(res.data.data);
+  const fetchEnrollStudents = async () =>{
+    try{
+        const res=await API.get('http://localhost:3000/api/admin/users?role=student&enrollmentStatus=approved')
+        setApproved(res.data.data);
 
-//     }catch(err){
-//         alert('Failed to fetch students');
-//     }
-//   }
-//   const handleToggle = async (id) => {
-//     try {
-//       await API.put(`http://localhost:3000/api/admin/users/toggle-status/${id}`);
-//       onRefresh();
-//     } catch (err) {
-//       alert('Failed to update status');
-//     }
-//   };
+    }catch(err){
+        alert('Failed to fetch students');
+    }
+  }
+  const handleToggle = async (id) => {
+    try {
+      await API.put(`http://localhost:3000/api/admin/users/toggle-status/${id}`);
+      onRefresh();
+      
+    } catch (err) {
+      alert('Failed to update status');
+    }
+  };
 
  const handleReject = async (id) => {
     const reason = prompt('Enter rejection reason:');

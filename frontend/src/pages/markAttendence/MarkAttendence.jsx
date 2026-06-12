@@ -68,9 +68,11 @@ const MarkAttendance = () => {
   };
   const fetchSubjects = async () => {
     try {
-      const res = await API.get("http://localhost:3000/api/admin/subjects");
-      console.log("Subjects API response:", res.data); // 👈 ADD THIS
-      setSubjects(res.data || []);
+      const res = await API.get("http://localhost:3000/api/student/enrolled-sub");
+      console.log("Subjects API response:", res.data); 
+      // 👈 ADD THIS
+      console.log('subject',res.data.data)
+      setSubjects(res.data.data || []);
       setTeacherId(res.data[0]?.teacher?._id || "");
     } catch (err) {
       console.error("Failed to fetch subjects");
@@ -193,7 +195,7 @@ const MarkAttendance = () => {
         {subjects.length > 0 ? (
           subjects.map((sub) => (
             <option key={sub._id} value={sub._id}>
-              {sub.name} && {teacherId}
+              {sub.name}
             </option>
           ))
         ) : (

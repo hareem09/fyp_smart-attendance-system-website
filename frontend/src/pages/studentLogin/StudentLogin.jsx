@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import axios from 'axios'
 import { useNavigate,Link } from 'react-router-dom';
+import API from '../../api/axios';
 function StudentLogin() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -24,7 +25,7 @@ function StudentLogin() {
      setError(null);
      setSuccess(false);
      try{
-      const res = await axios.post('http://localhost:3000/api/auth/login/student', { email, password }, { withCredentials: true });
+      const res = await API.post('http://localhost:3000/api/auth/login/student', { email, password }, { withCredentials: true });
      
         console.log('res.data:', res.data);
        console.log('accessToken:', res.data.accessToken);

@@ -62,8 +62,8 @@ const userSchema = new mongoose.Schema({
 
   // Face Enrollment
   faceEmbedding: {
-    type: [Number],      // 128-dimensional FaceNet vector
-    default: []
+    type: String,      // PATH
+    default: ""
   },
   enrollmentStatus: {
     type: String,

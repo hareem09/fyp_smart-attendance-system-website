@@ -22,6 +22,7 @@ import CreateInvite from './pages/admin/tabs/createInvite/CreateInvite';
 import AttendanceManagement from './pages/admin/tabs/attendenceManagement/AttendenceManagement';
 import GeofenceConfig      from './pages/admin/tabs/geofenceConfig/GeofenceConfig';
 import Reports             from './pages/admin/tabs/reports/Reports';
+import Report from './pages/teacher/tabs/reportTab/ReportTab'
 
 import TeacherDashboard from './pages/teacher/teacherDashboard/TeacherDasboard';
 import ForgotPassword from './pages/forgetPassword/ForgetPassword';
@@ -77,6 +78,9 @@ export default function App() {
         }/>
         <Route path="/admin/reports" element={
           <ProtectedRoute role="admin"><Reports /></ProtectedRoute>
+        }/>
+         <Route path="/teacher/reports" element={
+          <ProtectedRoute role="teacher"><Report /></ProtectedRoute>
         }/>
        </Route>
       </Routes>

@@ -1,95 +1,122 @@
-// frontend/src/api/axios.js
+
 import axios from 'axios';
 
 const API = axios.create({
   baseURL: 'http://localhost:3000/api',
-  withCredentials: true // important if using cookies for refresh token
+  withCredentials: true
 });
 
-// 🔐 Attach access token
+// ───────────────── REQUEST INTERCEPTOR ─────────────────
 API.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
+
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+
   return config;
 });
 
-
-// 🔁 Refresh logic variables
-let isRefreshing = false;
-let failedQueue = [];
-
-const processQueue = (error, token = null) => {
-  failedQueue.forEach(prom => {
-    if (error) prom.reject(error);
-    else prom.resolve(token);
-  });
-  failedQueue = [];
-};
-
-
-// 🔄 Response interceptor
+// ───────────────── RESPONSE INTERCEPTOR ─────────────────
 API.interceptors.response.use(
   (response) => response,
 
   async (error) => {
     const originalRequest = error.config;
+    const status = error.response?.status;
 
-    // 👉 If token expired (401)
-    if (error.response?.status === 401 && !originalRequest._retry) {
-
-      // If already refreshing → queue requests
-      if (isRefreshing) {
-        return new Promise((resolve, reject) => {
-          failedQueue.push({ resolve, reject });
-        }).then((token) => {
-          originalRequest.headers.Authorization = 'Bearer ' + token;
-          return API(originalRequest);
-        });
-      }
-
-      originalRequest._retry = true;
-      isRefreshing = true;
-
-      try {
-        // 🔁 CALL REFRESH TOKEN API
-        const res = await axios.post(
-          'http://localhost:3000/api/auth/refresh-token',
-          {},
-          { withCredentials: true }
-        );
-
-        const newToken = res.data.accessToken;
-
-        // ✅ Save new token
-        localStorage.setItem('token', newToken);
-
-        // ✅ Update header
-        API.defaults.headers.common['Authorization'] = 'Bearer ' + newToken;
-
-        processQueue(null, newToken);
-
-        // 🔁 Retry original request
-        originalRequest.headers.Authorization = 'Bearer ' + newToken;
-        return API(originalRequest);
-
-      } catch (err) {
-        processQueue(err, null);
-
-        // ❌ If refresh fails → logout
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        window.location.href = '/login';
-
-        return Promise.reject(err);
-
-      } finally {
-        isRefreshing = false;
-      }
+    // Safety guard
+    if (!originalRequest) {
+      return Promise.reject(error);
     }
 
-    return Promise.reject(error);
+    // Prevent infinite retry loop
+    if (originalRequest._retry) {
+      return Promise.reject(error);
+    }
+
+    // Skip refresh endpoints
+    const skipUrls = [
+      '/auth/login/student',
+      '/auth/login/admin'
+    ];
+
+    const shouldSkip = skipUrls.some((url) =>
+      originalRequest.url?.includes(url)
+    );
+
+    if (shouldSkip) {
+      return Promise.reject(error);
+    }
+
+    // Only refresh on 401
+    if (status !== 401) {
+      return Promise.reject(error);
+    }
+
+    originalRequest._retry = true;
+
+    try {
+      console.log('🔁 Refreshing token...');
+
+      // IMPORTANT
+      // Use plain axios here, NOT API instance
+      const response = await axios.post(
+        'http://localhost:3000/api/auth/refresh-token',
+        {},
+        {
+          withCredentials: true
+        }
+      );
+
+      
+        const newAccessToken = response.data.accessToken;
+
+      if (!newAccessToken) {
+        throw new Error('No access token returned');
+      }
+
+      // Save new token
+      localStorage.setItem('token', newAccessToken);
+
+      // Update headers
+      API.defaults.headers.common[
+        'Authorization'
+      ] = `Bearer ${newAccessToken}`;
+
+      originalRequest.headers[
+        'Authorization'
+      ] = `Bearer ${newAccessToken}`;
+
+      console.log('✅ Token refreshed');
+
+      // Retry original request
+      return API(originalRequest);
+
+    } catch (refreshError) {
+      console.log('❌ Refresh failed');
+
+      // READ USER BEFORE REMOVING
+      const user = JSON.parse(
+        localStorage.getItem('user') || '{}'
+      );
+
+      // Clear storage
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+
+      // Redirect
+      if (
+        user.role === 'admin' ||
+        user.role === 'teacher'
+      ) {
+        window.location.href = '/login/admin';
+      } else {
+        window.location.href = '/login';
+      }
+
+      return Promise.reject(refreshError);
+    }
   }
 );
 

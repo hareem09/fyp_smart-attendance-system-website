@@ -1,7 +1,8 @@
 const adminController = require('../../controller/admin/adminController.js')
 const express = require('express');
 const router = express.Router();
-
+const teacherController = require('../../controller/teacher/teacherController.js')
+const {getAllAttendance}=teacherController
 const {
         getAllUsers,
         getUserById,
@@ -35,4 +36,5 @@ router.post('/invite-student', createAndInviteStudent);
 router.post('/create-subject', createSubject);
 router.post('/assign', assignSubjectToTeacher);
 router.get('/subjects', getSubject);
+router.get('/all',getAllAttendance);
 module.exports = router;

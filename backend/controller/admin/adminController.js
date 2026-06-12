@@ -204,7 +204,7 @@ const rejectEnrollment = async (req, res) => {
       req.params.id,
       {
         enrollmentStatus: 'rejected',
-        faceEmbedding: []   // clear the bad embedding
+        faceEmbedding: "",
       },
       { new: true }
     ).select('-password -faceEmbedding -refreshToken -resetPasswordToken');
@@ -422,6 +422,7 @@ const assignSubjectToTeacher = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
 module.exports = {
     getAllUsers,
     getUserById,

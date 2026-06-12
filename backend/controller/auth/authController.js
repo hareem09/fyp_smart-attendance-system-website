@@ -88,11 +88,11 @@ const studentLogin = async (req, res) => {
     }
 
     const accessToken = generateAuthToken(user);
-    const refreshToken = generateRefreshToken(user);
+    const refreshTokenSecret = generateRefreshToken(user);
 
-    res.cookie("authToken", refreshToken, {
+    res.cookie("refreshToken", refreshTokenSecret, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: false,
       sameSite: "Lax",
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
     });
@@ -159,12 +159,13 @@ const adminLogin = async (req, res) => {
     const refreshTokenSecret = generateRefreshToken(user);
     user.refreshToken= refreshTokenSecret;
     await user.save();
-    res.cookie("refreshToken", refreshTokenSecret, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "Lax",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+res.cookie("refreshToken", refreshTokenSecret, {
+  httpOnly: true,
+  secure: false,
+  sameSite: "lax",
+  path: "/",   // ✅ ADD THIS
+  maxAge: 7 * 24 * 60 * 60 * 1000,
+});
     res.status(200).json({
       success: true,
       message: "Login successful",
@@ -184,25 +185,42 @@ const adminLogin = async (req, res) => {
 };
 
 const logout = async (req, res) => {
-  const refreshToken = req.cookies.authToken; //from httpOnly cookie
+  try {
+    console.log("COOKIES:", req.cookies);
 
-  if (!refreshToken) {
-    res.status(400).json({
-      message: "No refresh token provided",
+    const refreshToken = req.cookies.refreshToken;
+
+    if (!refreshToken) {
+      return res.status(400).json({
+        success: false,
+        message: "No refresh token provided",
+      });
+    }
+
+    const decoded = jwt.verify(refreshToken, process.env.REFRESH_SECRET);
+    const user = await User.findById(decoded.id);
+
+    if (user) {
+      user.refreshToken = "";
+      await user.save();
+    }
+
+   res.clearCookie("refreshToken", {
+  httpOnly: true,
+  secure: false,
+  sameSite: "lax",
+  path: "/",   // must match login
+});
+
+    return res.status(200).json({
+      success: true,
+      message: "Logged out successfully",
     });
+
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: err.message });
   }
-
-  //clear cookie
-  res.clearCookie("authToken", {
-    httpOnly: true,
-    secure: true,
-    sameSite: "Lax",
-  });
-
-  res.status(200).json({
-    success: true,
-    message: "Logout successfully",
-  });
 };
 
 const forgetPassword = async (req, res) => {
@@ -277,9 +295,10 @@ const resetPassword = async (req, res) => {
 
 const refreshAccessToken = async (req, res) => {
   try {
-    const refreshToken = req.cookies.refreshToken;
+const refreshToken = req.cookies.refreshToken ;
     console.log("Refresh token received:", refreshToken);
-    if (!refreshToken|| refreshToken === "null") {
+
+    if (!refreshToken || refreshToken === "null") {
       return res.status(401).json({ message: "No refresh token" });
     }
 
@@ -304,8 +323,9 @@ const refreshAccessToken = async (req, res) => {
     // Optional: send as cookie
     res.cookie("accessToken", newAccessToken, {
       httpOnly: true,
-      secure: true,
-      sameSite: "strict",
+      secure: false,
+      sameSite: "lax",
+
       maxAge: 15 * 60 * 1000,
     });
 
