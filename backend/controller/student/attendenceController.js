@@ -2,7 +2,7 @@
 const axios      = require('axios');
 const Attendance = require('../../model/attendanceModel/attendanceSchema.js');
 const Geofence   = require('../../model/geofenceModel/geofenceSchema.js');
-
+const Subject = require('../../model/subjectModel/subjectSchema.js')
 const markAttendance = async (req, res) => {
   try {
     const { frames, image, lat, lng, subjectId, teacherId } = req.body;
@@ -29,28 +29,35 @@ const markAttendance = async (req, res) => {
     }
 
     // Check student is enrolled in subject
-    const Subject = require('../../model/subjectModel/subjectSchema.js');
     const subject = await Subject.findOne({
-      _id:      subjectId,
-      students: studentId
-    });
+  _id:      subjectId,
+  students: studentId
+});
 
-    // if (!subject) {
-    //   return res.status(403).json({
-    //     success: false,
-    //     message: 'You are not enrolled in this subject'
-    //   });
-    // }
+console.log('subjectId received:', subjectId);
+console.log('studentId:', studentId);
+console.log('subject found:', subject);
+
+// if (!subject) {
+//   return res.status(403).json({
+//     success: false,
+//     message: 'You are not enrolled in this subject'
+//   });
+// }
 
     // ── CHECK DUPLICATE ───────────────────────────────
-    const today = new Date().toISOString().split('T')[0];
+    const startOfDay = new Date();
+startOfDay.setHours(0, 0, 0, 0);
 
-    const alreadyMarked = await Attendance.findOne({
-      student: studentId,
-      subject: subjectId,
-      date: today
-    });
+const endOfDay = new Date();
+endOfDay.setHours(23, 59, 59, 999);
 
+const alreadyMarked = await Attendance.findOne({
+  student: studentId,
+  subject: subjectId,
+  date: { $gte: startOfDay, $lte: endOfDay }
+});
+        console.log('Already marked:', alreadyMarked);
     if (alreadyMarked) {
       return res.status(400).json({
         success: false,
@@ -61,55 +68,46 @@ const markAttendance = async (req, res) => {
     // ── STEP 1: LIVENESS ─────────────────────────────
     console.log('Step 1: Checking liveness...');
 
-    let livenessResult;
-    try {
-      const livenessRes = await axios.post(
-        `${process.env.AI_SERVICE_URL}/liveness`,
-        { frames }
-      );
-      livenessResult = livenessRes.data;
-    }catch (err) {
-      if (err.code === 'ECONNREFUSED') {
-        return res.status(503).json({
-          success: false,
-          message: 'AI service is not running on port 8000'
-        });
-      }
-      // throw err;
-    }
-
-    if (!livenessResult.is_live) {
-      return res.status(400).json({
-        success: false,
-        message: livenessResult.reason,
-        step: 'liveness'
-      });
-    }
+   let livenessResult;
+try {
+  const livenessRes = await axios.post(`${process.env.AI_SERVICE_URL}/liveness`, { frames });
+  livenessResult = livenessRes.data;
+} catch (err) {
+  if (err.code === 'ECONNREFUSED') {
+    return res.status(503).json({ success: false, message: 'AI service is not running on port 8000' });
+  }
+  console.error('Liveness call failed:', err.response?.data || err.message);
+  return res.status(502).json({ success: false, message: 'AI service error during liveness check', step: 'liveness' });
+}
 
     // ── STEP 2: FACE RECOGNITION ─────────────────────
     console.log('Step 2: Recognizing face...');
 
       const recognizeRes = await axios.post(
-        `${process.env.AI_SERVICE_URL}/recognize`,
-        { image }
-      );
+  `${process.env.AI_SERVICE_URL}/recognize`,
+  { image },
+  { validateStatus: () => true }  // don't throw on 401, handle it manually below
+);
       const recognizeResult = recognizeRes.data;
       console.log('Recognition result:', recognizeResult);
-  if (!recognizeRes.data.success) {
-      return res.status(401).json({
-        success: false,
-        message: 'Face not recognized',
-        step:    'recognition'
-      });
-    }
+  if (!recognizeResult.success) {
+  return res.status(401).json({
+    success: false,
+    message: 'Face not recognized',
+    step: 'recognition'
+  });
+}
+  console.log('Recognized student ID:', recognizeResult.userId);
+// Verify recognized face belongs to logged-in student
+if (recognizeResult.userId !== studentId.toString()) {
+  return res.status(403).json({
+    success: false,
+    message: 'Recognized face does not belong to logged-in student',
+    step: 'recognition'
+  });
+}
 
-    if (recognizeRes.data.userId !== studentId.toString()) {
-      return res.status(401).json({
-        success: false,
-        message: 'Face does not match your profile',
-        step:    'recognition'
-      });
-    }
+    
 
     
       // if (err.code === 'ECONNREFUSED') {
@@ -147,8 +145,8 @@ const markAttendance = async (req, res) => {
       student:        studentId,
       subject:        subjectId,
       teacher:        subject.teacher,
-      date:           new Date(),
-      markedAt:       new Date(),
+        date: startOfDay,        // normalized, matches the index
+         markedAt: new Date(),   
       faceConfidence: recognizeRes.data.confidence,
       livenessPass:   true,
       geofencePass:   true,

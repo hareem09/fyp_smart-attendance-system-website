@@ -2,6 +2,7 @@
 export default function DashboardTab({
   overview, students, pendingEnroll, todayAttend, onTabChange
 }) {
+  const pending = pendingEnroll.filter(s => s.enrollmentStatus === 'pending').length;
   return (
     <div className="space-y-6">
 
@@ -10,8 +11,7 @@ export default function DashboardTab({
         {[
           { label: 'Total Students',      value: overview.totalStudents,      icon: '👨‍🎓', color: 'bg-blue-50 text-blue-600',     border: 'border-blue-100'   },
           { label: 'Total Teachers',      value: overview.totalTeachers,      icon: '👨‍🏫', color: 'bg-purple-50 text-purple-600', border: 'border-purple-100' },
-          { label: "Today's Attendance",  value: overview.todayAttendance,    icon: '✅',  color: 'bg-green-50 text-green-600',   border: 'border-green-100'  },
-          { label: 'Pending Enrollments', value: overview.pendingEnrollments, icon: '⏳',  color: 'bg-yellow-50 text-yellow-600', border: 'border-yellow-100' }
+          { label: 'Pending Enrollments', value: pendingEnroll.filter(s => s.enrollmentStatus === 'pending').length, icon: '⏳',  color: 'bg-yellow-50 text-yellow-600', border: 'border-yellow-100' }
         ].map((stat, i) => (
           <div key={i} className={`bg-white rounded-2xl p-5 shadow-sm border ${stat.border}`}>
             <div className="flex items-center justify-between mb-3">
@@ -34,7 +34,6 @@ export default function DashboardTab({
           {[
             { label: 'Add Student',      icon: '➕', tab: 'students'    },
             { label: 'Enrollments',      icon: '📷', tab: 'enrollments' },
-            { label: 'View Attendance',  icon: '📋', tab: 'attendance'  },
             { label: 'Set Geofence',     icon: '📍', tab: 'geofence'    }
           ].map((action, i) => (
             <button
@@ -50,14 +49,14 @@ export default function DashboardTab({
       </div>
 
       {/* Pending Enrollments Alert */}
-      {pendingEnroll.length > 0 && (
+      {pending.length > 0 && (
         <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <span className="text-2xl">⚠️</span>
               <div>
                 <p className="font-semibold text-yellow-800">
-                  {pendingEnroll.length} Pending Enrollment(s)
+                  {pending.length} Pending Enrollment(s)
                 </p>
                 <p className="text-yellow-600 text-sm">
                   Students waiting for face enrollment approval
@@ -89,7 +88,7 @@ export default function DashboardTab({
           <table className="w-full">
             <thead>
               <tr className="bg-gray-50">
-                {['Name', 'Roll No', 'Department', 'Enrollment', 'Status'].map(h => (
+                {['Name', 'Roll No', 'Department', 'Enrollment'].map(h => (
                   <th key={h} className="text-left text-xs font-medium text-gray-500 uppercase px-5 py-3">
                     {h}
                   </th>
@@ -124,13 +123,13 @@ export default function DashboardTab({
                       {student.enrollmentStatus || 'not enrolled'}
                     </span>
                   </td>
-                  <td className="px-5 py-3">
+                  {/* <td className="px-5 py-3">
                     <span className={`text-xs font-medium px-2.5 py-1 rounded-full
                       ${student.isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}
                     >
                       {student.isActive ? 'Active' : 'Inactive'}
                     </span>
-                  </td>
+                  </td> */}
                 </tr>
               ))}
             </tbody>

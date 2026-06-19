@@ -69,7 +69,7 @@ export default function AdminDashboard() {
       setSubjects(subjectRes.data   || []);
       console.log('attendance',allAttRes.data)
       console.log(studentsRes.data)
-       console.log(enrollRes.data) 
+       console.log('enroll',enrollRes.data.data) 
        console.log(subjectRes.data)
     } catch (err) {
       console.error('Fetch error:', err.message);
@@ -108,7 +108,7 @@ const handleLogout = async () => {
       await API.put(`http://localhost:3000/api/admin/toggle-status/${id}`);
       onRefresh();
     } catch (err) {
-      alert('Failed to update status');
+      alert(err.response?.data?.message )
     }
   };
   const handleReject = async (id) => {
@@ -186,7 +186,7 @@ const handleLogout = async () => {
             >
               <span className="text-lg">{link.icon}</span>
               {sidebarOpen && <span>{link.label}</span>}
-              {link.id === 'enrollments' && pendingEnroll.length > 0 && sidebarOpen && (
+              {link.id === 'enrollments' && pendingEnroll.filter(s => s.enrollmentStatus === 'pending').length > 0 && sidebarOpen && (
                 <span className="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
                   {pendingEnroll.length}
                 </span>
@@ -251,7 +251,6 @@ const handleLogout = async () => {
               overview={overview}
               students={students}
               pendingEnroll={pendingEnroll}
-              todayAttend={todayAttend}
               onTabChange={setActiveTab}
             />
           )}
@@ -264,15 +263,9 @@ const handleLogout = async () => {
           )}
           {activeTab === 'enrollments' && (
             <EnrollmentsTab
-              students={pendingEnroll}
+              students={pendingEnroll.filter(s => s.enrollmentStatus === 'pending')}
               onApprove={handleApprove}
               onReject={handleReject}
-            />
-          )}
-          {activeTab === 'attendance' && (
-            <AttendanceTab
-              records={allAttendance}
-              onRefresh={fetchAllData}
             />
           )}
           {activeTab === 'geofence' && (

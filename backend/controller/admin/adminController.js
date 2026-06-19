@@ -144,7 +144,7 @@ const toggleUserStatus = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: `User ${user.isActive ? 'activated' : 'deactivated'} successfully`,
+      message: `User ${user.accountStatus ? 'activated' : 'deactivated'} successfully`,
       data: { isActive: user.isActive }
     });
   } catch (error) {

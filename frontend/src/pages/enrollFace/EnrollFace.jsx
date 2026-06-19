@@ -64,7 +64,7 @@ export default function EnrollFace() {
       setMessage('✅ Face enrolled! Waiting for admin approval.');
 
       // Redirect after 2 seconds
-      setTimeout(() => navigate('/dashboard'), 2000);
+      setTimeout(() => navigate('/student/dashboard'), 2000);
 
     } catch (error) {
       setStatus('error');

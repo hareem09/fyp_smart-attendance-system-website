@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
 import API from '../../../../api/axios';
 
 function StudentManagement({ students, onRefresh, onToggleStatus }) {
@@ -29,16 +29,29 @@ function StudentManagement({ students, onRefresh, onToggleStatus }) {
     }
   };
 
-  const handleToggle = async (id) => {
+const handleToggle = async (id) => {
+  try {
+    await API.put(`/admin/toggle-status/${id}`);
+    onRefresh(); // refresh parent state
+
+  } catch (err) {
+    console.log(err);
+  }
+};
+useEffect(() => {
+  const fetchApproved = async () => {
     try {
-      await API.put(`http://localhost:3000/api/admin/toggle-status/${id}`);
-      onRefresh();
-      onToggleStatus(id);
+      const res = await API.get(
+        'http://localhost:3000/api/admin/users?role=student&accountStatus=true'
+      );
+      setApproved(res.data.data);
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to update status');
+      console.log(err);
     }
   };
 
+  fetchApproved();
+}, []);
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this student?')) return;
     try {
@@ -78,7 +91,7 @@ function StudentManagement({ students, onRefresh, onToggleStatus }) {
           <table className="w-full">
             <thead>
               <tr className="bg-gray-50">
-                {['Student', 'Roll No', 'Department', 'Semester', 'Enrollment', 'Status', 'Actions'].map(h => (
+                {['Student', 'Roll No', 'Department', 'Semester', 'Enrollment', 'Actions'].map(h => (
                   <th key={h} className="text-left text-xs font-medium text-gray-500 uppercase px-5 py-3">
                     {h}
                   </th>
@@ -94,7 +107,7 @@ function StudentManagement({ students, onRefresh, onToggleStatus }) {
                 </tr>
               ) : (
                 filtered.map((student, i) => (
-                  <tr key={i} className="hover:bg-gray-50 transition">
+                  <tr key={student._id || i} className="hover:bg-gray-50 transition">
                     <td className="px-5 py-3">
                       <div className="flex items-center gap-3">
                         <div className="w-9 h-9 bg-blue-100 rounded-full flex items-center justify-center">
@@ -121,21 +134,10 @@ function StudentManagement({ students, onRefresh, onToggleStatus }) {
                         {student.enrollmentStatus || 'not enrolled'}
                       </span>
                     </td>
-                    <td className="px-5 py-3">
-                      <span className={`text-xs font-medium px-2.5 py-1 rounded-full
-                        ${student.isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}
-                      >
-                        {student.isActive ? 'Active' : 'Inactive'}
-                      </span>
-                    </td>
+                    
                     <td className="px-5 py-3">
                       <div className="flex gap-2">
-                        <button
-                          onClick={() => handleToggle(student._id)}
-                          className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 px-2.5 py-1 rounded-lg transition"
-                        >
-                          {student.isActive ? 'Deactivate' : 'Activate'}
-                        </button>
+                        
                         <button
                           onClick={() => handleDelete(student._id)}
                           className="text-xs bg-red-50 hover:bg-red-100 text-red-500 px-2.5 py-1 rounded-lg transition"

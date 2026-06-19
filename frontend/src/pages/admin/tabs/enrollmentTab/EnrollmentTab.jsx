@@ -99,8 +99,8 @@ const [loadingApprove, setLoadingApprove] = useState(null);
           {/* Count */}
           <p className="text-sm text-gray-500">
             <span className="font-medium text-gray-800">
-              {filtered.length}
-            </span> pending enrollment(s)
+              {students.enrollmentStatus === 'pending' ? students.length : '0'}
+            </span> pending enrollments
           </p>
 
           {/* Cards Grid */}
