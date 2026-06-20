@@ -44,7 +44,7 @@ export default function AdminDashboard() {
         await Promise.all([
           API.get('http://localhost:3000/api/admin/overview'),
           API.get('http://localhost:3000/api/admin/users?role=student'),
-          API.get('http://localhost:3000/api/admin/users?enrollmentStatus=pending'),
+          API.get('http://localhost:3000/api/admin/users?enrollmentStatus=pending||enrollmentStatus=not_enrolled'),
           API.get('http://localhost:3000/api/teacher/today'),
           API.get('http://localhost:3000/api/teacher/all'),
           API.get('http://localhost:3000/api/admin/geofence'),

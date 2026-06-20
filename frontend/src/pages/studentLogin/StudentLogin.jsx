@@ -5,7 +5,7 @@ import API from '../../api/axios';
 function StudentLogin() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [showPass,setShowPassword] = useState(false)
+    const [showPass,setShowPass] = useState(false)
     const [message,setMessage]=useState("")
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);

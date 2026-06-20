@@ -1,17 +1,34 @@
 // src/pages/admin/tabs/DashboardTab.jsx
+import API from '../../../../api/axios';
+
 export default function DashboardTab({
-  overview, students, pendingEnroll, todayAttend, onTabChange
+  overview, students, pendingEnroll, todayAttend, onTabChange, onRefresh
 }) {
-  const pending = pendingEnroll.filter(s => s.enrollmentStatus === 'pending').length;
+  // FIX: removed the stray `.length` so `pending` is the array, not a number.
+  // Both the stat card and the alert banner now read off this same array,
+  // so the two counts can never disagree.
+  const pending = pendingEnroll.filter(
+    s => s.enrollmentStatus === 'pending' || s.enrollmentStatus === 'not_enrolled'
+  );
+
+  const handleToggleStatus = async (id) => {
+    try {
+      await API.put(`/admin/toggle-status/${id}`);
+      if (onRefresh) onRefresh();
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to update status');
+    }
+  };
+
   return (
     <div className="space-y-6">
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: 'Total Students',      value: overview.totalStudents,      icon: '👨‍🎓', color: 'bg-blue-50 text-blue-600',     border: 'border-blue-100'   },
-          { label: 'Total Teachers',      value: overview.totalTeachers,      icon: '👨‍🏫', color: 'bg-purple-50 text-purple-600', border: 'border-purple-100' },
-          { label: 'Pending Enrollments', value: pendingEnroll.filter(s => s.enrollmentStatus === 'pending').length, icon: '⏳',  color: 'bg-yellow-50 text-yellow-600', border: 'border-yellow-100' }
+          { label: 'Total Students',      value: overview.totalStudents, icon: '👨‍🎓', color: 'bg-blue-50 text-blue-600',     border: 'border-blue-100'   },
+          { label: 'Total Teachers',      value: overview.totalTeachers, icon: '👨‍🏫', color: 'bg-purple-50 text-purple-600', border: 'border-purple-100' },
+          { label: 'Pending Enrollments', value: pending.length,         icon: '⏳',  color: 'bg-yellow-50 text-yellow-600', border: 'border-yellow-100' }
         ].map((stat, i) => (
           <div key={i} className={`bg-white rounded-2xl p-5 shadow-sm border ${stat.border}`}>
             <div className="flex items-center justify-between mb-3">
@@ -32,9 +49,9 @@ export default function DashboardTab({
         <h2 className="font-semibold text-gray-800 mb-4">Quick Actions</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {[
-            { label: 'Add Student',      icon: '➕', tab: 'students'    },
-            { label: 'Enrollments',      icon: '📷', tab: 'enrollments' },
-            { label: 'Set Geofence',     icon: '📍', tab: 'geofence'    }
+            { label: 'Add Student',  icon: '➕', tab: 'students'    },
+            { label: 'Enrollments',  icon: '📷', tab: 'enrollments' },
+            { label: 'Set Geofence', icon: '📍', tab: 'geofence'    }
           ].map((action, i) => (
             <button
               key={i}
@@ -48,7 +65,7 @@ export default function DashboardTab({
         </div>
       </div>
 
-      {/* Pending Enrollments Alert */}
+      {/* Pending Enrollments Alert — now correctly triggers since `pending` is an array */}
       {pending.length > 0 && (
         <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-5">
           <div className="flex items-center justify-between">
@@ -56,7 +73,7 @@ export default function DashboardTab({
               <span className="text-2xl">⚠️</span>
               <div>
                 <p className="font-semibold text-yellow-800">
-                  {pending.length} Pending Enrollment(s)
+                   Pending Enrollment(s)
                 </p>
                 <p className="text-yellow-600 text-sm">
                   Students waiting for face enrollment approval
@@ -88,7 +105,7 @@ export default function DashboardTab({
           <table className="w-full">
             <thead>
               <tr className="bg-gray-50">
-                {['Name', 'Roll No', 'Department', 'Enrollment'].map(h => (
+                {['Name', 'Roll No', 'Department', 'Enrollment', 'Status'].map(h => (
                   <th key={h} className="text-left text-xs font-medium text-gray-500 uppercase px-5 py-3">
                     {h}
                   </th>
@@ -123,13 +140,24 @@ export default function DashboardTab({
                       {student.enrollmentStatus || 'not enrolled'}
                     </span>
                   </td>
-                  {/* <td className="px-5 py-3">
-                    <span className={`text-xs font-medium px-2.5 py-1 rounded-full
-                      ${student.isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}
-                    >
-                      {student.isActive ? 'Active' : 'Inactive'}
-                    </span>
-                  </td> */}
+                  {/* Active/Inactive toggle — wired to PUT /admin/users/toggle-status/:id */}
+                  <td className="px-5 py-3">
+                    <button
+  onClick={() => handleToggleStatus(student._id)}
+  className={`text-xs font-medium px-2.5 py-1 rounded-full transition cursor-pointer
+    ${student.accountStatus === 'active'
+      ? 'bg-green-100 text-green-700 hover:bg-green-200'
+      : 'bg-red-100 text-red-700 hover:bg-red-200'}`}
+>
+  {
+  student.accountStatus === 'active'
+    ? 'Active'
+    : student.accountStatus === 'deactivated'
+    ? 'Deactivated'
+    : 'Invited'
+}
+</button>
+                  </td>
                 </tr>
               ))}
             </tbody>

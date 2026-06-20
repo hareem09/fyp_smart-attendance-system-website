@@ -51,10 +51,16 @@ const enrollFace = async (req, res) => {
         message: `Need 5 images. Got ${images?.length || 0}`
       });
     }
-
+      const user= await User.findById(req.user.id);
+      if(user.faceEmbedding) {
+        return res.status(400).json({
+          success: false,
+          message: 'Face already enrolled'
+        });
+      }
     console.log('4. calling Python...');
     const axios = require('axios');
-
+  
     const aiResponse = await axios.post(
       `${process.env.AI_SERVICE_URL}/enroll`,
       { userId: req.user.id, images },

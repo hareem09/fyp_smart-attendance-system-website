@@ -131,7 +131,7 @@ useEffect(() => {
                           student.enrollmentStatus === 'rejected' ? 'bg-red-100 text-red-700'       :
                           'bg-gray-100 text-gray-600'}`}
                       >
-                        {student.enrollmentStatus || 'not enrolled'}
+                        {student.enrollmentStatus}
                       </span>
                     </td>
                     

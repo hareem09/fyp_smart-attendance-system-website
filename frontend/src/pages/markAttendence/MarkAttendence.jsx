@@ -21,15 +21,7 @@ const MarkAttendance = () => {
     fetchSubjects();
   
   }, []);
-  //  const fetchWindow = async (selectedSubject) =>{
-  //   try{
-  //     const res = await API.get(`/teacher/attendance-window/${selectedSubject._id}`);
-  //     setWindowStatus(res.data.data)
-  //   }catch(err){
-  //     console.error('Failed to fetch window status');
-  //   }
-  //  }
-   // Check window status when subject selected
+ 
    useEffect(() => {
     if (selectedSubject) {
       checkWindow(selectedSubject);

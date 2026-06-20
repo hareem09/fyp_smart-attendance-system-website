@@ -135,23 +135,38 @@ const deleteUser = async (req, res) => {
 const toggleUserStatus = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
-    if (!user) {
-      return res.status(404).json({ success: false, message: 'User not found' });
-    }
 
-    user.isActive = !user.isActive;
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+console.log("Before:", user.accountStatus);
+    user.accountStatus =
+      user.accountStatus === 'active'
+        ? 'deactivated'
+        : 'active';
+console.log("After:", user.accountStatus);
     await user.save();
 
     res.status(200).json({
       success: true,
-      message: `User ${user.accountStatus ? 'activated' : 'deactivated'} successfully`,
-      data: { isActive: user.isActive }
+      message: `User ${user.accountStatus} successfully`,
+      data: {
+        accountStatus: user.accountStatus
+      }
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Server error', error: error.message });
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+     console.log(error)
   }
+ 
 };
-
 // ─── APPROVE USER ACCOUNT ─────────────────────────────────────
 const approveUser = async (req, res) => {
   try {
