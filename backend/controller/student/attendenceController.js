@@ -72,6 +72,13 @@ const alreadyMarked = await Attendance.findOne({
 try {
   const livenessRes = await axios.post(`${process.env.AI_SERVICE_URL}/liveness`, { frames });
   livenessResult = livenessRes.data;
+  console.log('Liveness result:', livenessResult);
+  if (livenessResult.is_live !== true){
+    return res.status(401).json({
+      success: false,
+      message: 'Liveness check failed'
+    })
+  }
 } catch (err) {
   if (err.code === 'ECONNREFUSED') {
     return res.status(503).json({ success: false, message: 'AI service is not running on port 8000' });
@@ -106,19 +113,6 @@ if (recognizeResult.userId !== studentId.toString()) {
     step: 'recognition'
   });
 }
-
-    
-
-    
-      // if (err.code === 'ECONNREFUSED') {
-      //   return res.status(503).json({
-      //     success: false,
-      //     message: 'AI service is not running on port 8000'
-      //   });
-      
-      // throw err;
-
-    
 
     // ── STEP 3: GEOFENCE ─────────────────────────────
     console.log('Step 3: Validating geofence...');
@@ -167,14 +161,7 @@ if (recognizeResult.userId !== studentId.toString()) {
 
     console.log('✅ Attendance saved:', attendance._id);
 
-    // return res.status(201).json({
-    //   success: true,
-    //   message: 'Attendance marked successfully',
-    //   data: {
-    //     attendanceId: attendance._id,
-    //     confidence: recognizeResult.confidence
-    //   }
-    // });
+
 
   }catch (error) {
     console.error('❌ Attendance error:', error.message);

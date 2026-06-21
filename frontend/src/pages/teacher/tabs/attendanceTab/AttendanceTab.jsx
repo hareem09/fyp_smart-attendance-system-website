@@ -179,7 +179,17 @@ const AttendanceTab = ({ records, onRefresh }) => {
                     </td>
                     <td className="px-5 py-3">
                       <button
-                        onClick={() => handleOverride(record._id)}
+                        onClick={() => {
+  console.log("record:", record);
+  console.log("record._id:", record?._id);
+
+  if (!record?._id) {
+    alert("Invalid attendance record ID");
+    return;
+  }
+
+  handleOverride(record._id);
+}}
                         className="text-xs bg-yellow-50 hover:bg-yellow-100 text-yellow-600 px-2.5 py-1 rounded-lg border border-yellow-200 transition"
                       >
                         Override

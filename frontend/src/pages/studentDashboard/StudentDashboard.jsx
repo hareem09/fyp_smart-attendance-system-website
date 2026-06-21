@@ -36,11 +36,17 @@ const StudentDashboard = () => {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    navigate('/login');
-  };
+   const handleLogout =async () =>{
+    try{
+     await API.post('http://localhost:3000/api/auth/logout');
+     localStorage.removeItem('token');
+     localStorage.removeItem('user');
+     navigate('/login');
+    }
+    catch(err){
+      console.error('Failed to logout');
+    }
+  }
 
   // ── CALCULATE OVERALL PERCENTAGE ──────────────────────────
   const overallPercentage = summary.length > 0

@@ -197,21 +197,17 @@ const logout = async (req, res) => {
       });
     }
 
-    const decoded = jwt.verify(refreshToken, process.env.REFRESH_SECRET);
-    const user = await User.findById(decoded.id);
-
-    if (user) {
-      user.refreshToken = "";
-      await user.save();
-    }
-
+    const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+    await User.findByIdAndUpdate(decoded.id, { refreshToken: "" });
+    
+   
    res.clearCookie("refreshToken", {
   httpOnly: true,
   secure: false,
   sameSite: "lax",
   path: "/",   // must match login
 });
-
+   
     return res.status(200).json({
       success: true,
       message: "Logged out successfully",

@@ -97,10 +97,11 @@ const getTodayAttendance = async (req, res) => {
 // ─── MANUALLY OVERRIDE ATTENDANCE ────────────────────────────
 const updateAttendance = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { attendanceId } = req.params;
+    console.log(attendanceId)
     const { status, overrideReason } = req.body;
 
-    const record = await Attendance.findById(id).populate('subject');
+    const record = await Attendance.findById(attendanceId).populate('subject');
 
     // Make sure this attendance belongs to teacher's subject
     if (record.subject.teacher.toString() !== req.user.id) {

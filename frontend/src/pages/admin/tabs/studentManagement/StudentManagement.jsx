@@ -55,7 +55,7 @@ useEffect(() => {
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this student?')) return;
     try {
-      await API.delete(`http://localhost:3000/api/admin/users/${id}`);
+      await API.delete(`http://localhost:3000/api/admin/user/${id}`);
       onRefresh();
     } catch (err) {
       alert(err.response?.data?.message || 'Failed to delete');

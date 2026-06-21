@@ -19,7 +19,7 @@ router.get('/profile',getProfile);
 router.get('/students',getMyStudents);
 router.get('/all',getAllAttendance);
 router.get('/today',getTodayAttendance);
-router.put('/attendance/:studentId',updateAttendance);
+router.put('/attendance/:attendanceId',updateAttendance);
 router.get('/low-attendance',getLowAttendanceStudents);
 router.get('/export',exportAttendance);
 router.get('/teacher-subjects',            getTeacherSubjects);
